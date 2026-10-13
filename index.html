@@ -821,10 +821,13 @@
           useCORS: true
         });
         const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png", .95));
+        if (!blob) throw new Error("生成长图失败，请重试");
         const filename = `耍起VS卷王-${state.resultId || Date.now()}.png`;
         const file = new File([blob], filename, { type: "image/png" });
 
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        if (isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({ files: [file], title: "耍起 VS 卷王性格测评结果" });
           showToast("已打开保存/分享面板");
         } else {
@@ -833,7 +836,7 @@
           link.href = url;
           link.download = filename;
           link.click();
-          URL.revokeObjectURL(url);
+          window.setTimeout(() => URL.revokeObjectURL(url), 30000);
           showToast("长图已生成并下载");
         }
       } catch (error) {
