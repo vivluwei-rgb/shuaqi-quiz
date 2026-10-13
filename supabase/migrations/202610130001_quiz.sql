@@ -1,3 +1,4 @@
+begin;
 create table public.quiz_codes (
   code text primary key check (code ~ '^[A-Z0-9-]{1,64}$'),
   max_uses integer not null default 3 check (max_uses between 1 and 1000),
@@ -113,7 +114,7 @@ begin
     v_prefix := regexp_replace(upper(coalesce(p_body->>'prefix', 'SQ')), '[^A-Z0-9]', '', 'g');
     v_prefix := left(coalesce(nullif(v_prefix, ''), 'SQ'), 16);
     while jsonb_array_length(v_created) < v_count loop
-      v_text := v_prefix || '-' || upper(replace(gen_random_uuid()::text, '-', ''));
+      v_text := v_prefix || '-' || upper(left(replace(gen_random_uuid()::text, '-', ''), 16));
       insert into public.quiz_codes(code, max_uses) values(v_text, v_max) on conflict do nothing;
       if found then v_created := v_created || jsonb_build_array(v_text); end if;
     end loop;
@@ -138,3 +139,4 @@ end;
 $$;
 revoke execute on function public.quiz_dispatch(text, jsonb) from public, anon, authenticated;
 grant execute on function public.quiz_dispatch(text, jsonb) to service_role;
+commit;
