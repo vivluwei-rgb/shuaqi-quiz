@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>测评管理后台</title>
+  <style>
+    :root {
+      --ink: #191816;
+      --sub: #68615b;
+      --panel: #fffdfa;
+      --line: #e8ddd0;
+      --brand: #cf3f33;
+      --paper: #fff7ea;
+      --green: #176d68;
+      --shadow: 0 18px 45px rgba(72, 48, 28, .13);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: linear-gradient(180deg, #fff8ee 0%, #f6efe6 100%);
+    }
+
+    button, input { font: inherit; }
+
+    .app {
+      width: min(1120px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 56px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    h1 { margin: 0; font-size: clamp(30px, 5vw, 52px); letter-spacing: 0; }
+    h2 { margin: 0 0 12px; font-size: 22px; }
+    p { color: var(--sub); line-height: 1.7; }
+
+    .panel {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .82);
+      box-shadow: var(--shadow);
+    }
+
+    .login {
+      max-width: 480px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      color: var(--sub);
+      font-size: 13px;
+    }
+
+    input {
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+    }
+
+    .btn {
+      min-height: 42px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .btn.dark {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .stat span {
+      color: var(--sub);
+      font-size: 13px;
+    }
+
+    .stat b {
+      display: block;
+      margin-top: 6px;
+      font-size: 30px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, .9fr) minmax(0, 1.1fr);
+      gap: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow-wrap: anywhere;
+    }
+
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--sub);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #e0f2ea;
+      color: var(--green);
+      font-size: 12px;
+    }
+
+    .badge.off {
+      background: #ffe2dc;
+      color: #8f2c25;
+    }
+
+    .error {
+      min-height: 22px;
+      color: #8f2c25;
+      font-size: 14px;
+      margin: 8px 0 0;
+    }
+
+    .generated-box {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff7ea;
+      color: var(--sub);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      max-height: 220px;
+      overflow: auto;
+    }
+
+    .generated-box.active {
+      display: block;
+    }
+
+    .admin { display: none; }
+    .admin.active { display: block; }
+
+    @media (max-width: 860px) {
+      .grid, .layout, .form-grid { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .table-wrap { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1>测评管理后台</h1>
+        <p>管理测评密码、使用次数和结果记录。</p>
+      </div>
+      <a class="btn" href="./index.html">返回前台</a>
+    </header>
+
+    <section class="panel login" id="loginPanel">
+      <h2>登录后台</h2>
+      <label class="field">
+        后台密码
+        <input id="adminPassword" type="password" placeholder="请输入后台密码" autocomplete="current-password">
+      </label>
+      <p class="error" id="loginError"></p>
+      <div class="actions">
+        <button class="btn primary" id="loginBtn" type="button">进入后台</button>
+      </div>
+    </section>
+
+    <section class="admin" id="adminPanel">
+      <div class="grid">
+        <div class="stat"><span>密码数量</span><b id="statCodes">0</b></div>
+        <div class="stat"><span>已消耗次数</span><b id="statUsed">0</b></div>
+        <div class="stat"><span>总可用次数</span><b id="statCapacity">0</b></div>
+        <div class="stat"><span>已生成结果</span><b id="statResults">0</b></div>
+      </div>
+
+      <div class="layout">
+        <section class="panel">
+          <h2>新增测评密码</h2>
+          <label class="field">
+            密码
+            <input id="newCode" placeholder="例如 VIP1001">
+          </label>
+          <div style="height:10px"></div>
+          <label class="field">
+            可测试次数
+            <input id="newMaxUses" type="number" value="3" min="1">
+          </label>
+          <p class="error" id="codeError"></p>
+          <div class="actions">
+            <button class="btn primary" type="button" id="createCodeBtn">生成密码</button>
+            <button class="btn" type="button" id="refreshBtn">刷新数据</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>随机批量生成</h2>
+          <div class="form-grid">
+            <label class="field">
+              生成数量
+              <input id="batchCount" type="number" value="50" min="1" max="1000">
+            </label>
+            <label class="field">
+              密码前缀
+              <input id="batchPrefix" value="SQ" placeholder="例如 SQ">
+            </label>
+            <label class="field">
+              每个密码次数
+              <input id="batchMaxUses" type="number" value="3" min="1">
+            </label>
+          </div>
+          <p class="error" id="batchError"></p>
+          <div class="actions">
+            <button class="btn primary" type="button" id="batchCreateBtn">批量生成密码</button>
+            <button class="btn" type="button" id="copyBatchBtn">复制本次生成</button>
+          </div>
+          <div class="generated-box" id="generatedBox"></div>
+        </section>
+      </div>
+
+      <section class="panel" style="margin-top:16px">
+        <h2>密码列表</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>密码</th>
+                  <th>状态</th>
+                  <th>使用</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="codesTable"></tbody>
+            </table>
+          </div>
+      </section>
+
+      <section class="panel" style="margin-top:16px">
+        <h2>结果记录</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>密码</th>
+                <th>结果</th>
+                <th>分数</th>
+                <th>链接</th>
+              </tr>
+            </thead>
+            <tbody id="resultsTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="./app-config.js"></script>
+  <script src="./api-client.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    let adminPassword = sessionStorage.getItem("quizAdminPassword") || "";
+    let lastGeneratedCodes = [];
+    $("adminPassword").value = adminPassword;
+
+    async function adminApi(path, options = {}) {
+      return window.QuizApi.request(path, {
+        ...options,
+        headers: {
+          "content-type": "application/json",
+          "x-admin-password": adminPassword,
+          ...(options.headers || {})
+        }
+      });
+    }
+
+    function fmtTime(value) {
+      return new Date(value).toLocaleString("zh-CN", { hour12: false });
+    }
+
+    async function loadState() {
+      const data = await adminApi("/api/admin/state");
+      $("statCodes").textContent = data.stats.codes;
+      $("statUsed").textContent = data.stats.used;
+      $("statCapacity").textContent = data.stats.capacity;
+      $("statResults").textContent = data.stats.results;
+
+      $("codesTable").innerHTML = data.codes.map(code => `
+        <tr>
+          <td><strong>${code.code}</strong></td>
+          <td><span class="badge ${code.active ? "" : "off"}">${code.active ? "启用" : "停用"}</span></td>
+          <td>${code.used} / ${code.maxUses}</td>
+          <td>
+            <button class="btn" data-action="toggle" data-code="${code.code}" data-active="${code.active}">${code.active ? "停用" : "启用"}</button>
+            <button class="btn" data-action="reset" data-code="${code.code}">重置次数</button>
+          </td>
+        </tr>
+      `).join("");
+
+      $("resultsTable").innerHTML = data.results.map(item => `
+        <tr>
+          <td>${fmtTime(item.createdAt)}</td>
+          <td>${item.code}</td>
+          <td>${item.name}</td>
+          <td>耍起 ${item.playPercent}% / 卷王 ${item.grindPercent}%</td>
+          <td><a href="${window.QuizApi.resultUrl(item.id)}" target="_blank" rel="noopener">查看</a></td>
+        </tr>
+      `).join("") || `<tr><td colspan="5">还没有结果记录</td></tr>`;
+    }
+
+    $("loginBtn").addEventListener("click", async () => {
+      adminPassword = $("adminPassword").value;
+      $("loginError").textContent = "";
+      try {
+        await loadState();
+        sessionStorage.setItem("quizAdminPassword", adminPassword);
+        $("loginPanel").style.display = "none";
+        $("adminPanel").classList.add("active");
+      } catch (error) {
+        $("loginError").textContent = error.message;
+      }
+    });
+
+    $("createCodeBtn").addEventListener("click", async () => {
+      $("codeError").textContent = "";
+      try {
+        await adminApi("/api/admin/codes", {
+          method: "POST",
+          body: JSON.stringify({
+            code: $("newCode").value,
+            maxUses: $("newMaxUses").value
+          })
+        });
+        $("newCode").value = "";
+        $("newMaxUses").value = "3";
+        await loadState();
+      } catch (error) {
+        $("codeError").textContent = error.message;
+      }
+    });
+
+    $("batchCreateBtn").addEventListener("click", async () => {
+      $("batchError").textContent = "";
+      $("generatedBox").classList.remove("active");
+      try {
+        const data = await adminApi("/api/admin/codes/batch", {
+          method: "POST",
+          body: JSON.stringify({
+            count: $("batchCount").value,
+            prefix: $("batchPrefix").value,
+            maxUses: $("batchMaxUses").value || 3
+          })
+        });
+        lastGeneratedCodes = data.created || [];
+        $("generatedBox").textContent = lastGeneratedCodes.join("\n");
+        $("generatedBox").classList.add("active");
+        await loadState();
+      } catch (error) {
+        $("batchError").textContent = error.message;
+      }
+    });
+
+    $("copyBatchBtn").addEventListener("click", async () => {
+      $("batchError").textContent = "";
+      if (!lastGeneratedCodes.length) {
+        $("batchError").textContent = "请先批量生成密码。";
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(lastGeneratedCodes.join("\n"));
+        $("batchError").textContent = `已复制 ${lastGeneratedCodes.length} 个密码。`;
+      } catch (error) {
+        $("batchError").textContent = "复制失败，可以手动选中下方密码。";
+      }
+    });
+
+    $("refreshBtn").addEventListener("click", loadState);
+
+    $("codesTable").addEventListener("click", async event => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      const code = button.dataset.code;
+      if (button.dataset.action === "toggle") {
+        await adminApi("/api/admin/codes/update", {
+          method: "POST",
+          body: JSON.stringify({ code, active: button.dataset.active !== "true" })
+        });
+      }
+      if (button.dataset.action === "reset") {
+        await adminApi("/api/admin/codes/update", {
+          method: "POST",
+          body: JSON.stringify({ code, resetUsed: true })
+        });
+      }
+      await loadState();
+    });
+  </script>
+</body>
+</html>
