@@ -52,7 +52,7 @@ test("Pages build includes only frontend assets", () => {
 test("Pages build refuses to expose a service-role key", () => {
   const key = "header." + Buffer.from(JSON.stringify({ role: "service_role" })).toString("base64url") + ".signature";
   assert.throws(() => execFileSync(process.execPath, ["scripts/build-pages.js"], {
-    cwd: root, env: { ...process.env, SUPABASE_PUBLISHABLE_KEY: key }, stdio: "pipe"
+    cwd: root, env: { ...process.env, CI: "", QUIZ_API_BASE: "https://example.supabase.co/functions/v1/quiz-api", SUPABASE_PUBLISHABLE_KEY: key }, stdio: "pipe"
   }), /Only a publishable or anon key/);
 });
 
