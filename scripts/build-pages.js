@@ -17,4 +17,12 @@ for (const file of ["index.html", "admin.html", "quiz-data.js", "api-client.js"]
 }
 fs.writeFileSync(path.join(output, "app-config.js"), `window.QUIZ_CONFIG = ${JSON.stringify({ apiBase, publishableKey })};\n`);
 fs.writeFileSync(path.join(output, ".nojekyll"), "");
+const ismOutput = path.join(output, "shuaqi-ism");
+fs.mkdirSync(ismOutput, { recursive: true });
+for (const file of ["index.html", "admin.html", "quiz-data.js", "api-client.js"]) {
+  fs.copyFileSync(path.join(root, "shuaqi-ism", file), path.join(ismOutput, file));
+}
+const ismBase = apiBase ? apiBase.replace(/\/quiz-api$/, "/shuaqi-api") : "";
+fs.cpSync(path.join(root, "shuaqi-ism/assets"), path.join(ismOutput, "assets"), { recursive: true });
+fs.writeFileSync(path.join(ismOutput, "app-config.js"), `window.QUIZ_CONFIG = ${JSON.stringify({ apiBase: ismBase, publishableKey })};\n`);
 console.log("Pages artifact prepared: frontend files only.");

@@ -45,7 +45,7 @@ test("Pages build includes only frontend assets", () => {
     cwd: root, env: { ...process.env, CI: "", QUIZ_API_BASE: "", SUPABASE_PUBLISHABLE_KEY: "" }
   });
   assert.deepEqual(fs.readdirSync(path.join(root, "dist")).sort(), [
-    ".nojekyll", "admin.html", "api-client.js", "app-config.js", "index.html", "quiz-data.js"
+    ".nojekyll", "admin.html", "api-client.js", "app-config.js", "index.html", "quiz-data.js", "shuaqi-ism"
   ]);
 });
 
@@ -57,7 +57,7 @@ test("Pages build refuses to expose a service-role key", () => {
 });
 
 test("HTML inline scripts are syntactically valid", () => {
-  for (const file of ["index.html", "admin.html"]) {
+  for (const file of ["index.html", "admin.html", "shuaqi-ism/index.html", "shuaqi-ism/admin.html"]) {
     const html = fs.readFileSync(path.join(root, file), "utf8");
     for (const match of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) {
       new vm.Script(match[1], { filename: file });

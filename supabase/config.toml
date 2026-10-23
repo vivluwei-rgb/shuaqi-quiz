@@ -2,3 +2,6 @@ project_id = "shuaqi-quiz"
 
 [functions.quiz-api]
 verify_jwt = false
+
+[functions.shuaqi-api]
+verify_jwt = false

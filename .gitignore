@@ -7,4 +7,5 @@ node_modules/
 dist/
 supabase/.temp/
 supabase/functions/quiz-api/quiz-data.js
+supabase/functions/shuaqi-api/quiz-data.js
 .deploy/
