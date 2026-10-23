@@ -828,7 +828,7 @@
       $("flawCopy").textContent = profile.flaw;
       $("adviceCopy").textContent = profile.advice;
       $("quoteCopy").textContent = profile.quote;
-      $("shareText").textContent = state.resultId === "sample" ? "这是示例报告。完成答题后，才会生成属于你的路线和三个趣味指数。" : `${result.shareText}\n\n结果链接：${state.shareUrl}`;
+      $("shareText").textContent = state.resultId === "sample" ? "这是示例报告。完成答题后，才会生成属于你的路线和三个趣味指数。" : result.shareText;
       $("copyLinkBtn").disabled = state.resultId === "sample";
       showScreen("resultScreen");
     }
